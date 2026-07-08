@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BirrGo - Premium Tasks</title>
+    <!-- Premium, modern tech typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-burgundy: #800020;
+            --primary-gradient: linear-gradient(135deg, #9b0026 0%, #4a0000 100%);
+            --accent-glow: rgba(128, 0, 32, 0.15);
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --border-light: #e2e8f0;
+            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            --success-green: #10b981;
+            --warning-amber: #f59e0b;
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.2px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: #f1f5f9;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-view {
+            width: 100%;
+            height: 100dvh;
+            max-width: 450px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--bg-light);
+            padding: calc(16px + env(safe-area-inset-top)) 20px calc(95px + env(safe-area-inset-bottom)) 20px;
+            scrollbar-width: none;
+        }
+        .app-content::-webkit-scrollbar { display: none; }
+
+        /* Premium Header Styling */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 4px 2px;
+        }
+
+        .logo-image {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            letter-spacing: -0.6px;
+        }
+
+        .section-heading {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+            letter-spacing: -0.4px;
+        }
+
+        /* Task List Matrix Stack */
+        .active-list-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .list-item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            padding: 16px;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.15s ease;
+        }
+
+        .list-item-card:active {
+            transform: scale(0.99);
+        }
+
+        .list-item-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .list-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fcf6f0;
+        }
+
+        .list-icon-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        .list-item-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+
+        .list-item-info p {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .reward-highlight {
+            color: var(--primary-burgundy);
+            font-weight: 800;
+        }
+
+        /* Tactile Action Buttons */
+        .btn-task {
+            background: var(--primary-burgundy);
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            min-width: 95px;
+            text-align: center;
+            box-shadow: 0 4px 10px var(--accent-glow);
+            transition: all 0.2s ease;
+        }
+
+        .btn-task:disabled {
+            cursor: not-allowed;
+        }
+
+        .btn-task.cooldown {
+            background: #e2e8f0;
+            color: var(--text-muted);
+            box-shadow: none;
+        }
+
+        .btn-task.watching {
+            background: var(--warning-amber);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        /* Premium Glass Tier Invite Container */
+        .invite-card {
+            background: #ffffff;
+            border: 1px dashed var(--primary-burgundy);
+            padding: 20px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invite-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .invite-desc {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .invite-desc b {
+            color: var(--primary-burgundy);
+            font-weight: 700;
+        }
+
+        .global-action-area {
+            display: flex;
+            gap: 14px;
+            margin-top: 5px;
+        }
+
+        .btn-action-filled {
+            width: 100%;
+            height: 52px;
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(128, 0, 32, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-filled:active {
+            transform: scale(0.97);
+        }
+
+        /* High-End Micro Notification Pop */
+        .toast-container {
+            position: absolute;
+            top: calc(20px + env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Fixed Premium Navigation Matrix */
+        .bottom-nav-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: calc(68px + env(safe-area-inset-bottom));
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            gap: 4px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active-tab {
+            color: var(--primary-burgundy);
+        }
+        
+        .nav-item.active-tab .tab-icon-wrapper {
+            background-color: #fdf2f4;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: -2px;
+        }
+        .nav-item.active-tab svg {
+            stroke: var(--primary-burgundy);
+            stroke-width: 2.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toast">Code Copied!</div>
+
+    <div class="app-view">
+        
+        <div class="app-content">
+            
+            <!-- Branding Header Row -->
+            <div class="brand-header">
+                <img class="logo-image" src="birrgo-logo.png" alt="BirrGo Mobile Wallet">
+            </div>
+
+            <h1 class="page-title">Tasks</h1>
+
+            <h2 class="section-heading">Watch & Earn</h2>
+            <div class="active-list-stack" id="video-task-container">
+                <!-- Dynamic task rows render clean code natively below -->
+            </div>
+
+            <h2 class="section-heading">Invite System</h2>
+            <div class="invite-card">
+                <h3 class="invite-title">Invite Friends</h3>
+                <p class="invite-desc">Share your unique link with friends. When they join BirrGo, you will receive a random bonus cash drop of up to <b>20 Birr</b> directly in your wallet balance!</p>
+                <div class="global-action-area">
+                    <button class="btn-action-filled" id="shareBtn">Share Invite Link</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Persistent Premium Navigation Frame -->
+        <nav class="bottom-nav-bar">
+            <a href="dashboard.html" class="nav-item">
+                <svg viewBox="0 0 24 24" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Hub
+            </a>
+            <a href="#" class="nav-item active-tab">
+                <div class="tab-icon-wrapper">
+                    <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                </div>
+                Tasks
+            </a>
+            <a href="lottery.html" class="nav-item">
+                <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Lottery
+            </a>
+            <a href="wallet.html" class="nav-item">
+                <svg viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                Wallet
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- Modular Firebase Application Environment Pipeline -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Global Firebase Configuration Mapping Matrix
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRHoIZf1ZPR9m3YYTv-I9CfwyGqsSOMWo",
+            authDomain: "birrgo-fdf7e.firebaseapp.com",
+            databaseURL: "https://birrgo-fdf7e-default-rtdb.firebaseio.com",
+            projectId: "birrgo-fdf7e",
+            storageBucket: "birrgo-fdf7e.firebasestorage.app",
+            messagingSenderId: "2317445154",
+            appId: "1:2317445154:web:4275cbb0f46b28f64f827b",
+            measurementId: "G-24X13TZ43D"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Task Constants Configuration
+        const totalVideos = 5;
+        const watchDuration = 120; // 2 minutes in seconds
+        const cooldownDuration = 3600000; // 1 hour cooldown matrix
+
+        // Task Specific Explicit URL Targeting Matrix
+        const taskUrls = {
+            1: "https://omg10.com/4/10851265",
+            2: "https://omg10.com/4/10933166",
+            3: "https://omg10.com/4/10933166",
+            4: "https://omg10.com/4/10933166",
+            5: "https://omg10.com/4/10933166"
+        };
+
+        let activeUserPhone = "";
+
+        // Verify active user context session on layout initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            activeUserPhone = localStorage.getItem('auth_session_phone');
+            if (!activeUserPhone) {
+                window.location.href = "login.html";
+                return;
+            }
+            initTasks();
+        });
+
+        function initTasks() {
+            const container = document.getElementById('video-task-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= totalVideos; i++) {
+                const card = document.createElement('div');
+                card.className = 'list-item-card';
+                card.id = `video-card-${i}`;
+
+                const lastWatched = localStorage.getItem(`video_cooldown_${i}`);
+                const now = Date.now();
+                
+                let buttonHTML = `<button class="btn-task" id="btn-action-${i}">Watch</button>`;
+                
+                if (lastWatched && (now - lastWatched < cooldownDuration)) {
+                    const remainingTime = Math.ceil((cooldownDuration - (now - lastWatched)) / 60000);
+                    buttonHTML = `<button class="btn-task cooldown" id="btn-action-${i}">Cooldown</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="list-item-left">
+                        <div class="list-icon-box">
+                            <img src="33164.png" alt="10 Birr Logo">
+                        </div>
+                        <div class="list-item-info">
+                            <h4>Video Task ${i}</h4>
+                            <p>Watch 2 minutes<br>Reward: <span class="reward-highlight">10 Birr</span></p>
+                        </div>
+                    </div>
+                    ${buttonHTML}
+                `;
+                container.appendChild(card);
+
+                // Dynamically append scoping event listener rules to prevent namespace collision
+                const targetBtn = document.getElementById(`btn-action-${i}`);
+                if (targetBtn.classList.contains('cooldown')) {
+                    const remainingTime = Math.ceil((cooldownDuration - (now - lastWatched)) / 60000);
+                    targetBtn.addEventListener('click', () => showReminder(remainingTime));
+                } else {
+                    targetBtn.addEventListener('click', () => handleTask(i));
+                }
+            }
+        }
+
+        async function handleTask(id) {
+            const card = document.getElementById(`video-card-${id}`);
+            const btn = card.querySelector('.btn-task');
+            
+            // Open video task destination in a separate modern browser frame block
+            const targetUrl = taskUrls[id] || "https://omg10.com/4/10933166";
+            window.open(targetUrl, '_blank');
+
+            // Initialize local countdown system context on current app viewport view
+            btn.className = "btn-task watching";
+            btn.disabled = true;
+            
+            let timeLeft = watchDuration;
+            btn.innerText = "2:00";
+
+            const countdown = setInterval(async () => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                btn.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    
+                    try {
+                        // Establish referencing directory targeting user's precise wallet balance
+                        const balanceRef = ref(db, `users/${activeUserPhone}/walletBalance`);
+                        
+                        // Execute high-precision atomic counter operation inside database transaction
+                        await runTransaction(balanceRef, (currentBalance) => {
+                            let parsedBalance = parseFloat(currentBalance);
+                            if (isNaN(parsedBalance)) {
+                                parsedBalance = 0;
+                            }
+                            return parsedBalance + 10;
+                        });
+
+                        // Commit individual localized item timestamp verification onto the device cache
+                        localStorage.setItem(`video_cooldown_${id}`, Date.now());
+                        alert("Success! 10 Birr has been credited directly to your database wallet balance.");
+                    } catch (error) {
+                        console.error("Firebase Transaction Balance Update Dropped: ", error);
+                        alert("Network validation error. Balance sync failed but cooldown applied.");
+                    }
+                    
+                    initTasks();
+                }
+            }, 1000);
+        }
+
+        function showReminder(minutes) {
+            alert(`This video row is locked. Please come back after ${minutes} minutes to watch and claim another 10 Birr!`);
+        }
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const mockLink = "https://birrgo.com/invite?code=BG" + Math.floor(100000 + Math.random() * 900000);
+            navigator.clipboard.writeText(mockLink).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
